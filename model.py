@@ -43,6 +43,8 @@ y_train = np.array(augmented_measurements)
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D
 from keras.layers.convolutional import Convolution2D
+from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
+from keras.layers.normalization import BatchNormalization
 
 model = Sequential()
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160, 320, 3)))
@@ -58,8 +60,13 @@ model.add(Dense(50))
 model.add(Dense(10))
 model.add(Dense(1))
 
+callback_tb = TensorBoard(log_dir='./logs', write_images=True)
+callback_cp = ModelCheckpoint(filepath="./checkpoint/drive.hdf5", verbose=1, save_best_only=True)
+callbacks = [callback_tb]
+
 model.compile(loss='mse', optimizer='adam')
-history_object = model.fit(X_train, y_train, validation_split=0.2, shuffle=True, verbose=1, nb_epoch=7)
+history_object = model.fit(X_train, y_train, validation_split=0.2
+                           , shuffle=True, verbose=1, nb_epoch=7, callbacks=callbacks)
 
 model.save('model.h5')
 
@@ -75,5 +82,5 @@ plt.title('model mean squared error loss')
 plt.ylabel('mean squared error loss')
 plt.xlabel('epoch')
 plt.legend(['training set', 'validation set'], loc='upper right')
-plt.savefig('train_result.png')
+plt.savefig('./result/train_result.png')
 plt.show(block=True)
