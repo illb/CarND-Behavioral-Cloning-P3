@@ -1,3 +1,4 @@
+import os
 import csv
 import cv2
 import numpy as np
@@ -12,6 +13,23 @@ _CAMERA_INDEX_RIGHT = 2
 def _flip(img):
     return cv2.flip(img, 1)
 
+def _crop_top_bottom(img):
+    return img[70:-25,:]
+
+# def _resize(img):
+#     return cv2.resize(img, (320, 65))
+
+def _blur(img):
+    return cv2.blur(img,(5,5))
+
+def _to_grayscale(img):
+    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+def _preprocess(img):
+    img = _crop_top_bottom(img)
+    img = _blur(img)
+    # img = _to_grayscale(img).reshape(img.shape[0], img.shape[1], 1)
+    return img
 
 def _generator(samples, is_train, batch_size=32):
     num_samples = len(samples)
@@ -27,7 +45,9 @@ def _generator(samples, is_train, batch_size=32):
                 if is_train:
                     cameras = range(3)
                 for camera_index in cameras:
-                    image = cv2.imread(batch_sample[camera_index])
+                    path = batch_sample[camera_index]
+                    image = cv2.imread(path)
+                    image = _preprocess(image)
                     angle = float(batch_sample[3])
                     if camera_index == _CAMERA_INDEX_LEFT:
                         angle += _correction
@@ -53,17 +73,19 @@ def _generator(samples, is_train, batch_size=32):
             y_train = np.array(result_measurements)
             yield sklearn.utils.shuffle(X_train, y_train)
 
-_data_dirs = ['./data/track1-run-01',
-              './data/track1-run-02',
-              './data/track1-recover-01',
-              './data/track1-reverse-01',
-              './data/track2-run-01',
-              './data/track2-recover-01']
+_DATA_DIR = './data'
+
 _train_data_len_multiply = 3 * 2 # cameras * flip
 
-def generators():
+def _get_samples():
+    data_dirs = []
+    for path in os.listdir(_DATA_DIR):
+        dir = _DATA_DIR + "/" + path
+        if os.path.isdir(dir):
+            data_dirs.append(dir)
+
     samples = []
-    for dir in _data_dirs:
+    for dir in data_dirs:
         with open(dir + "/driving_log.csv") as csvfile:
             reader = csv.reader(csvfile)
             for line in reader:
@@ -72,6 +94,10 @@ def generators():
                     line[i] = dir + '/IMG/' + filename
                 samples.append(line)
 
+    return samples
+
+def generators():
+    samples = _get_samples()
     from sklearn.model_selection import train_test_split
     tv_samples, test_samples = train_test_split(samples, test_size=0.2)
     train_samples, validation_samples = train_test_split(tv_samples, test_size=0.2)

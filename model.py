@@ -4,9 +4,12 @@ from keras.layers.convolutional import Convolution2D
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
 from keras.layers.normalization import BatchNormalization
 
+#input_shape = (160, 320, 3)
+input_shape = (65, 320, 3)
+
 model = Sequential()
-model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160, 320, 3), name='normalization'))
-model.add(Cropping2D(cropping=((70, 25), (0, 0)), name='crop'))
+model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=input_shape, name='normalization'))
+#model.add(Cropping2D(cropping=((70, 25), (0, 0)), name='crop'))
 model.add(Convolution2D(24, 5, 5, subsample=(2, 2), activation='relu', name='conv_01'))
 model.add(Convolution2D(36, 5, 5, subsample=(2, 2), activation='relu', name='conv_02'))
 model.add(Convolution2D(48, 5, 5, subsample=(2, 2), activation='relu', name='conv_03'))
@@ -23,10 +26,9 @@ callback_cp = ModelCheckpoint(filepath="./checkpoint/drive-{epoch:02d}-{val_acc:
                               save_best_only=True, mode='max')
 callbacks = [callback_tb]
 
-name = "01_nvidia_multi_camera_and_flip"
+name = "02_nvidia_blur"
 
 import data
-
 train_generator, train_batch_len, validation_generator, validation_batch_len, test_generator, test_batch_len = data.generators()
 
 # model.load_weights("./checkpoint/drive-01-01.hdf5")
