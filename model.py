@@ -1,15 +1,12 @@
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D
 from keras.layers.convolutional import Convolution2D
-from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
+from keras.callbacks import TensorBoard, ModelCheckpoint, CSVLogger
 from keras.layers.normalization import BatchNormalization
 
-#input_shape = (160, 320, 3)
-input_shape = (65, 320, 3)
-
 model = Sequential()
-model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=input_shape, name='normalization'))
-#model.add(Cropping2D(cropping=((70, 25), (0, 0)), name='crop'))
+model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160, 320, 3), name='normalization'))
+model.add(Cropping2D(cropping=((70, 25), (0, 0)), name='crop'))
 model.add(Convolution2D(24, 5, 5, subsample=(2, 2), activation='relu', name='conv_01'))
 model.add(Convolution2D(36, 5, 5, subsample=(2, 2), activation='relu', name='conv_02'))
 model.add(Convolution2D(48, 5, 5, subsample=(2, 2), activation='relu', name='conv_03'))
@@ -21,12 +18,13 @@ model.add(Dense(50, name='fc_02'))
 model.add(Dense(10, name='fc_03'))
 model.add(Dense(1, name='fc_04'))
 
-callback_tb = TensorBoard(log_dir='./logs', write_images=True)
-callback_cp = ModelCheckpoint(filepath="./checkpoint/drive-{epoch:02d}-{val_acc:.2f}.hdf5", verbose=1,
-                              save_best_only=True, mode='max')
-callbacks = [callback_tb]
+name = "01_nvidia_multi_camera_and_flip"
 
-name = "02_nvidia_blur"
+callback_tb = TensorBoard(log_dir='./logs', write_images=True)
+callback_cp = ModelCheckpoint(filepath='./checkpoint/train_' + name + '-{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1,
+                              save_best_only=True, mode='max')
+callback_logger = CSVLogger('./result/train_log_' + name + '.csv')
+callbacks = [callback_tb, callback_cp, callback_logger]
 
 import data
 train_generator, train_batch_len, validation_generator, validation_batch_len, test_generator, test_batch_len = data.generators()
@@ -40,7 +38,7 @@ history_object = model.fit_generator(train_generator, samples_per_epoch=train_ba
 
 model.save('model.h5')
 
-print(model.evaluate_generator(test_generator, test_batch_len))
+print("test loss: {}".format(model.evaluate_generator(test_generator, test_batch_len)))
 
 import matplotlib.pyplot as plt
 
