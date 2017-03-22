@@ -84,7 +84,7 @@ def generators():
     train_samples, validation_samples = train_test_split(tv_samples, test_size=0.2)
 
     # compile and train the model using the generator function
-    train_generator = _generator(train_samples, True, batch_size=32)
-    validation_generator = _generator(validation_samples, False, batch_size=32)
-    test_generator = _generator(test_samples, False, batch_size=32)
+    train_generator = _generator(train_samples, True, batch_size=64)
+    validation_generator = _generator(validation_samples, False, batch_size=64)
+    test_generator = _generator(test_samples, False, batch_size=64)
     return train_generator, (len(train_samples) * _train_data_len_multiply), validation_generator, len(validation_samples), test_generator, len(test_samples)
