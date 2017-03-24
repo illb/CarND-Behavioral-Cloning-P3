@@ -23,6 +23,7 @@ def _generator(samples, is_train, batch_size=32):
             images = []
             measurements = []
             for batch_sample in batch_samples:
+                # there are 3 camera images (center, left, right) in a row
                 cameras = [0]
                 if is_train:
                     cameras = range(3)
@@ -30,6 +31,7 @@ def _generator(samples, is_train, batch_size=32):
                     path = batch_sample[camera_index]
                     image = cv2.imread(path)
                     angle = float(batch_sample[3])
+                    # needs some angle correction
                     if camera_index == _CAMERA_INDEX_LEFT:
                         angle += _correction
                     elif camera_index == _CAMERA_INDEX_RIGHT:
@@ -40,6 +42,7 @@ def _generator(samples, is_train, batch_size=32):
 
             result_images, result_measurements = [], []
             if is_train:
+                # to augment the data, add the flipping data
                 for image, measurement in zip(images, measurements):
                     result_images.append(image)
                     result_measurements.append(measurement)

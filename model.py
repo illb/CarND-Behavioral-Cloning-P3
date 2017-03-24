@@ -5,6 +5,10 @@ from keras.callbacks import TensorBoard, ModelCheckpoint, CSVLogger
 from keras.regularizers import l2
 from keras.optimizers import Adam
 
+# based on nvidia model : https://arxiv.org/abs/1604.07316
+# referred to comma ai : https://github.com/commaai/research/blob/master/train_steering_model.py
+# added l2 regularizer
+
 model = Sequential()
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160, 320, 3), name='normalization'))
 model.add(Cropping2D(cropping=((70, 25), (0, 0)), name='crop'))
@@ -24,6 +28,7 @@ model.add(Dense(1, name='fc_04'))
 
 name = "04_nvidia_dropout2"
 
+# to analyze, added tensor board data and result logs
 callback_tb = TensorBoard(log_dir='./logs', write_images=True)
 callback_cp = ModelCheckpoint(filepath='./checkpoint/train_' + name + '-{epoch:02d}-{val_loss:.2f}.hdf5', verbose=1,
                               save_best_only=True, mode='max')
