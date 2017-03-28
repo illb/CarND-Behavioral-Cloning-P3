@@ -66,12 +66,11 @@ The fully connected layers with dropouts and l2 regularizers are reduce to outpu
 
 The model contains dropout layers in order to reduce overfitting (model.py lines 21, 23, 25). 
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting (data.py lines 85 - 87). The model was tested test data sets and tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained, validated and tested on different data sets to ensure that the model was not overfitting (data.py lines 135 - 136). The model was tested test data sets and tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 ####3. Model parameter tuning
 
 * optimizer : adam (not tuned)
-* batch size : 64 (to faster learning)
 * l2 regularizer : 0.001
 * dropout p : 0.5 ~ 0.7
 
@@ -117,11 +116,11 @@ At the end of the process, the vehicle is able to drive autonomously around the 
 
 ####2. Final Model Architecture
 
-The final model architecture (model.py lines 14 - 27) consisted of a convolution neural network with the following layers
+The final model architecture (model.py lines 13 - 27) consisted of a convolution neural network with the following layers
 
 | Layer         		|     Description	        					| 
 |:---------------------:|:---------------------------------------------:| 
-| Input         		| 160x320x3 RGB image | 
+| Input         		| 160x320x6 RGB & HSV image | 
 | Preprocess            | nomalization & crop to 65x320x3  | 
 | Convolution 5x5     	| 5x5 stride, 2x2 subsample, l2 regularizer, valid padding |
 | RELU					|				|
