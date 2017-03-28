@@ -14,13 +14,17 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/placeholder.png "Model Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./examples/placeholder_small.png "Recovery Image"
-[image5]: ./examples/placeholder_small.png "Recovery Image"
-[image6]: ./examples/placeholder_small.png "Normal Image"
-[image7]: ./examples/placeholder_small.png "Flipped Image"
+[image1]: ./writeup-data/layer_diagram.jpg =800x "layer diagram"
+[image2]: ./writeup-data/center_2017_03_23_16_08_32_270.jpg "center lane drving"
+[image3]: ./writeup-data/flipped_center_2017_03_23_16_08_32_270.jpg "filpped image"
+[image4]: ./writeup-data/random_brightness_center_2017_03_23_16_08_32_270.jpg "random brightness"
+[image5]: ./writeup-data/random_gamma_center_2017_03_23_16_08_32_270.jpg "random gamma"
+[image6_0]: ./writeup-data/hsv0_center_2017_03_23_16_08_32_270.jpg "hsv0"
+[image6_1]: ./writeup-data/hsv1_center_2017_03_23_16_08_32_270.jpg "hsv0"
+[image6_2]: ./writeup-data/hsv2_center_2017_03_23_16_08_32_270.jpg "hsv0"
+[image7]: ./writeup-data/center_2017_03_24_09_30_44_683.jpg "reverse drving"
+[image8]: ./writeup-data/center_2017_03_24_23_33_11_617.jpg "recovery drving"
+[image9]: ./writeup-data/center_2017_03_24_10_21_27_366.jpg "track 2 drving"
 
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
@@ -51,76 +55,139 @@ The model.py file contains the code for training and saving the convolution neur
 
 ####1. An appropriate model architecture has been employed
 
-My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24) 
+My model consists of a convolution neural network with 3x3 and 5x5 filter sizes and depths between 24 and 64.
+The convolution neural network includes RELU layers to introduce nonlinearity (model.py lines 15-19) 
 
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18). 
+The data is normalized in the model using a Keras lambda layer (code line 13), and cropped top 70 pixels and bottom 25 pixels (line 14)
+
+The fully connected layers with dropouts and l2 regularizers are reduce to output angle data (lines 21 - 27)
 
 ####2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
+The model contains dropout layers in order to reduce overfitting (model.py lines 21, 23, 25). 
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting (data.py lines 85 - 87). The model was tested test data sets and tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 ####3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+* optimizer : adam (not tuned)
+* batch size : 64 (to faster learning)
+* l2 regularizer : 0.001
+* dropout p : 0.5 ~ 0.7
 
 ####4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
+Training data was chosen to keep the vehicle driving on the road.
 
-For details about how I created the training data, see the next section. 
+* track 1
+  * 3 center lane drivings
+  * 1 recovery driving
+  * 1 reverse way driving
+* track 2
+  * 1 center lane drving
+  * 1 recovery driving
 
 ###Model Architecture and Training Strategy
 
 ####1. Solution Design Approach
+My first step was to use a convolution neural network model similar to the nvidia archetecture. (https://arxiv.org/pdf/1604.07316.pdf)
 
-The overall strategy for deriving a model architecture was to ...
+I thought this model might be appropriate because simple and easy to modify
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+To train better
+* normalize data
+* crop data to eliminate unnecessary parts 
+* flip image to eliminate the left bias
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
+In order to gauge how well the model was working, I split my image and steering angle data into a training, validation and test set.
 
-To combat the overfitting, I modified the model so that ...
+To combat the overfitting
+* add dropout layers
+* add l2 regularizers
 
-Then I ... 
-
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
+The model was less lossy and could prevent overfitting, but it went out of the way.
+I tried various things and fixed it with traning data improvement
+* more data
+  * well driven data on center lane
+  * recovery data to avoid out of the way
+  * reverse way driving data to avoid side bias
+  * track 2 data to generalize
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
 ####2. Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
+The final model architecture (model.py lines 14 - 27) consisted of a convolution neural network with the following layers
 
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
+| Layer         		|     Description	        					| 
+|:---------------------:|:---------------------------------------------:| 
+| Input         		| 160x320x3 RGB image | 
+| Preprocess            | nomalization & crop to 65x320x3  | 
+| Convolution 5x5     	| 5x5 stride, 2x2 subsample, l2 regularizer, valid padding |
+| RELU					|				|
+| Convolution 5x5     	| 5x5 stride, 2x2 subsample, l2 regularizer, valid padding |
+| RELU					|				|
+| Convolution 5x5     	| 5x5 stride, 2x2 subsample, l2 regularizer, valid padding |
+| RELU					|				|
+| Convolution 3x3     	| 3x3 stride, l2 regularizer, valid padding |
+| RELU					|				|
+| Convolution 3x3     	| 3x3 stride, l2 regularizer, valid padding |
+| RELU					|				|
+| Flatten				|              |
+| dropout				| keep probability 0.5	|
+| Fully connected		| outputs 100, l2 regularizer |
+| RELU					|		|
+| dropout				| keep probability 0.7 |
+| Fully connected		| outputs 50, l2 regularizer |
+| RELU					|		|
+| dropout				| keep probability 0.7	|
+| Fully connected		| outputs 10, l2 regularizer |
+| RELU					|		|
+| Fully connected		| outputs 1    |
 
-![alt text][image1]
+Here is a visualization of the architecture
+
+![layer diagram][image1]
 
 ####3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+* good driving behavior recording
+  * 2 laps on center lane driving
 
-![alt text][image2]
+![center lane][image2]
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+* flip
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
+![flip][image3]
 
-Then I repeated this process on track two in order to get more data points.
+  * random brightness
 
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
+![random brightness][image4]
 
-![alt text][image6]
-![alt text][image7]
+  * random alpha
 
-Etc ....
+![random alpha][image5]
 
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+* concat hsv color scale image
+  
+![hsv0][image6_0]
+![hsv1][image6_1]
+![hsv2][image6_2]
 
+* reverse tarck recording
+  * 1 lap on reverse way
+  
+![reverse][image7]
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
+* recovery drive recording
+  
+![recovery][image8]
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+* track 2
+  * train on track 2
+
+![track2][image9]
+
+* split data set
+  * first split 20% test data set, 80% training & validation data set
+  * then split 80% training & validation data set into 80% training, 20% validation data set
