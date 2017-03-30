@@ -78,21 +78,21 @@ def _generator(samples, is_train, batch_size=32):
                     result_images.append(image)
                     result_measurements.append(measurement)
 
-                    result_images.append(_random_brightness(image))
-                    result_measurements.append(measurement)
-
-                    result_images.append(_random_gamma(image))
-                    result_measurements.append(measurement)
+                    # result_images.append(_random_brightness(image))
+                    # result_measurements.append(measurement)
+                    #
+                    # result_images.append(_random_gamma(image))
+                    # result_measurements.append(measurement)
 
                     flipped = _flip(image)
                     result_images.append(flipped)
                     result_measurements.append(measurement * -1.0)
 
-                    result_images.append(_random_brightness(flipped))
-                    result_measurements.append(measurement * -1.0)
-
-                    result_images.append(_random_gamma(flipped))
-                    result_measurements.append(measurement * -1.0)
+                    # result_images.append(_random_brightness(flipped))
+                    # result_measurements.append(measurement * -1.0)
+                    #
+                    # result_images.append(_random_gamma(flipped))
+                    # result_measurements.append(measurement * -1.0)
             else:
                 result_images = images
                 result_measurements = measurements
@@ -108,7 +108,7 @@ def _generator(samples, is_train, batch_size=32):
 
 _DATA_DIR = './data'
 
-_train_data_len_multiply = 3 * 3 * 2 # cameras * random data * flip
+_train_data_len_multiply = 3 * 1 * 2 # cameras * random data * flip
 
 def _get_samples():
     data_dirs = []
