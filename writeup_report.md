@@ -17,8 +17,6 @@ The goals / steps of this project are the following:
 [image1]: ./writeup-data/layer_diagram.jpg =800x "layer diagram"
 [image2]: ./writeup-data/center_2017_03_23_16_08_32_270.jpg "center lane drving"
 [image3]: ./writeup-data/flipped_center_2017_03_23_16_08_32_270.jpg "filpped image"
-[image4]: ./writeup-data/random_brightness_center_2017_03_23_16_08_32_270.jpg "random brightness"
-[image5]: ./writeup-data/random_gamma_center_2017_03_23_16_08_32_270.jpg "random gamma"
 [image6_0]: ./writeup-data/hsv0_center_2017_03_23_16_08_32_270.jpg "hsv0"
 [image6_1]: ./writeup-data/hsv1_center_2017_03_23_16_08_32_270.jpg "hsv0"
 [image6_2]: ./writeup-data/hsv2_center_2017_03_23_16_08_32_270.jpg "hsv0"
@@ -66,7 +64,7 @@ The fully connected layers with dropouts and l2 regularizers are reduce to outpu
 
 The model contains dropout layers in order to reduce overfitting (model.py lines 21, 23, 25). 
 
-The model was trained, validated and tested on different data sets to ensure that the model was not overfitting (data.py lines 135 - 136). The model was tested test data sets and tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained, validated and tested on different data sets to ensure that the model was not overfitting (data.py lines 100 - 101). The model was tested test data sets and tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 ####3. Model parameter tuning
 
@@ -158,14 +156,6 @@ Here is a visualization of the architecture
 * flip
 
 ![flip][image3]
-
-  * random brightness
-
-![random brightness][image4]
-
-  * random alpha
-
-![random alpha][image5]
 
 * concat hsv color scale image
   
