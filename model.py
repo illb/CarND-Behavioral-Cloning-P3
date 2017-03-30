@@ -45,7 +45,7 @@ optimizer = Adam()
 model.compile(loss='mse', optimizer=optimizer)
 history_object = model.fit_generator(train_generator, samples_per_epoch=train_batch_len,
                                      validation_data=validation_generator, nb_val_samples=validation_batch_len,
-                                     verbose=1, nb_epoch=10, callbacks=callbacks, initial_epoch=initial_epoch)
+                                     verbose=1, nb_epoch=5, callbacks=callbacks, initial_epoch=initial_epoch)
 
 model.save('model.h5')
 
